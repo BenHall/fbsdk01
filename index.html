@@ -19,16 +19,33 @@
 	    	console.log(rsp);
 
 	    	FB.api('/', "POST", {"batch": [{"method":"GET","name":"get-likes","relative_url":"me/likes?limit=10"}, {"method":"GET","relative_url":"?ids={result=get-likes:$.data.*.id}"}]},function(res) {
+	    		$("body").append('<div>*** Likes ***</div>');
 	    		var json = JSON.parse(res[1].body);
 	    		for(i in json) {
 	    			var j = json[i];
-	    			console.log(j);
 
 	    			var mission = j.mission;
 	    			if(mission === undefined)
 	    				mission = "No mission";
 
 	    			$("body").append('<div>' + j.name + " - " + mission + '</div>');
+	    		}
+	    	});
+
+	    	FB.api('/', "POST", {"batch": [{"method":"GET", "relative_url":"me/likes?limit=10&offset=0"},{"method":"GET", "relative_url":"me/likes?limit=20&offset=10"},{"method":"GET", "relative_url":"me/likes?limit=30&offset=20"}]},
+	    		function(res) {
+	    		$("body").append('<div>*** Likes - Batched ***</div>');
+	    		console.log(res);
+	    		for(r in res) {
+	    			$("body").append('<h1>Starting batch </h1>');
+	    			var batch = res[r];
+	    			var json = JSON.parse(batch.body);
+	    			console.log(json)
+	    			for(i in json.data) {
+	    				var j = json.data[i];
+
+	    				$("body").append('<div>' + j.name + '</div>');
+	    			}
 	    		}
 	    	});
 	    }, {scope:'user_likes'});
